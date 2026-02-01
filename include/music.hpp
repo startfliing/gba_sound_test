@@ -12,6 +12,10 @@ struct note{
 
 note createNote(u8 noteVal, s8 octave, u8 duration);
 void note_play(note noteObj);
+void incNoteVal(note* currNote);
+void decNoteVal(note* currNote);
+
+void playCurrSong(note* songStart, int noteCt);
 
 
 #endif

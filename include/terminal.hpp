@@ -10,6 +10,7 @@ class Terminal{
         static u16 setCNT(u8 bg, u16 cbb, u16 sbb);
 
         static void reset();
+        static void eraseLine();
 
         static void log(const char* word){
             if(need_new_line){
@@ -58,6 +59,7 @@ class Terminal{
         static void drawVal(char c);
         static void drawVal(const char* string);
         static void clearTopRow();
+        static void clearBotRow();
         static void updateScreen();
         static void advanceOneLine();
         

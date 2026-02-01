@@ -147,6 +147,14 @@ void Terminal::clearTopRow(){
     }
 }
 
+//clear a row right before writing on it
+void Terminal::clearBotRow(){
+    TILE blank = text_font.getTile(0);
+    for(int j = 0; j < TERMINAL_TEXT_WIDTH; j++){
+        tile_mem[text_cbb][(curr_line_num*TERMINAL_TEXT_WIDTH)+j+1] = blank;
+    }
+}
+
 //redraw screen so that curr_line_num is on the bottom of the screen
 void Terminal::updateScreen(){
     //get next line number
@@ -166,6 +174,21 @@ void Terminal::advanceOneLine(){
 
     //clear_topRow
     clearTopRow();
+
+    //redraw rows on screen
+    updateScreen();
+
+    //reset tile and pixel num
+    curr_tile_num = 0;
+    curr_pixel_num = 0;
+}
+
+void Terminal::eraseLine(){
+    clearTopRow();
+
+    //update line num
+    curr_line_num = wrap(curr_line_num - 1, 0, TERMINAL_TEXT_HEIGHT);
+    
 
     //redraw rows on screen
     updateScreen();

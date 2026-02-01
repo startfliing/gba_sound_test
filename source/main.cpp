@@ -39,13 +39,14 @@ int main()
 	REG_BG1CNT = BG_BUILD(0,17,0,0,0,0,0);
     REG_BG0CNT = Terminal::setCNT(0,1,16);
 
-
     memcpy16(pal_bg_mem, imagePal, imagePalLen/2);
     LZ77UnCompVram(imageTiles, tile_mem[0]);
     memcpy16(&se_mem[17], imageMap, imageMapLen/2);
 
-    int currNote = 0;
-    int currOctave = 0;
+
+    note currSong[24];
+    int currNoteInd = 0;
+    note currNote = {0,0,4};
 
     // turn sound on
     REG_SNDSTAT= SSTAT_ENABLE;
@@ -60,39 +61,45 @@ int main()
     REG_SND1CNT= SSQR_ENV_BUILD(8, 0, 7) | SSQR_DUTY1_2;
     REG_SND1FREQ= 0;
 
-    theLick();
+    note_play(currNote);
 
     while(1)
     {
         VBlankIntrWait();
         key_poll();
 
-        // Change octave:
-        currOctave += bit_tribool(key_hit(-1), KI_R, KI_L);
-        currOctave = wrap(currOctave, -2, 6);
-
         // Play note
-        if(key_hit(KEY_DIR|KEY_A))
-        {
-            if(key_hit(KEY_UP))
-                note_play(createNote(0, currOctave, 2));
-            if(key_hit(KEY_LEFT))
-                note_play(createNote(2, currOctave, 2));
-            if(key_hit(KEY_RIGHT))
-                note_play(createNote(4, currOctave, 2));
-            if(key_hit(KEY_DOWN))
-                note_play(createNote(5, currOctave, 2));
-            if(key_hit(KEY_A))
-                note_play(createNote(7, currOctave, 2));
+
+        if(key_hit(KEY_UP) || key_hit(KEY_DOWN)){
+            key_tri_vert() == -1 ? incNoteVal(&currNote) : decNoteVal(&currNote);
+            Terminal::eraseLine();
+            note_play(currNote);
+        }
+
+        if(key_hit(KEY_B) && currNoteInd != 0){
+            currNoteInd--;
+            currNote = currSong[currNoteInd];
+            Terminal::eraseLine();
+        }
+
+        if(key_hit(KEY_A) && currNoteInd != 23){
+            currSong[currNoteInd] = currNote;
+            currNoteInd++;
+            note_play(currNote);
         }
 
 		if(key_hit(KEY_START)){
-			Terminal::reset();
+            Terminal::reset();
+			playCurrSong(currSong, currNoteInd);
+            note_play(currNote);
 		}
 
-        // Play ditty
-        if(key_hit(KEY_B))
-            theLick();      
+        if(key_hit(KEY_SELECT)){
+            Terminal::reset();
+			currNoteInd = 0;
+            note_play(currNote);
+		}
+    
     }
     return 0;
 }
