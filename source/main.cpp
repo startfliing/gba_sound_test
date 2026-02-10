@@ -2,6 +2,7 @@
 
 #include "terminal.hpp"
 #include "image.h"
+#include "staff.h"
 #include "soundbank_bin.h"
 #include "music.hpp"
 
@@ -31,17 +32,17 @@ void theLick()
 
 int main()
 {
-    REG_DISPCNT = DCNT_MODE0 | DCNT_BG0 | DCNT_BG1;
+    REG_DISPCNT = DCNT_MODE0 | DCNT_BG0;
 
     irq_init(NULL);
     irq_add(II_VBLANK, NULL);
 
-	REG_BG1CNT = BG_BUILD(0,17,0,0,0,0,0);
-    REG_BG0CNT = Terminal::setCNT(0,1,16);
+	REG_BG0CNT = BG_BUILD(0,17,1,0,0,0,0); //size 1 for wide bg
+    //REG_BG0CNT = Terminal::setCNT(0,1,16);
 
-    memcpy16(pal_bg_mem, imagePal, imagePalLen/2);
-    LZ77UnCompVram(imageTiles, tile_mem[0]);
-    memcpy16(&se_mem[17], imageMap, imageMapLen/2);
+    memcpy16(pal_bg_mem, staffPal, staffPalLen/2);
+    memcpy16(tile_mem[0], staffTiles, staffTilesLen/2);
+    memcpy16(&se_mem[17], staffMap, staffMapLen/2);
 
 
     note currSong[24];
@@ -72,14 +73,14 @@ int main()
 
         if(key_hit(KEY_UP) || key_hit(KEY_DOWN)){
             key_tri_vert() == -1 ? incNoteVal(&currNote) : decNoteVal(&currNote);
-            Terminal::eraseLine();
+            //Terminal::eraseLine();
             note_play(currNote);
         }
 
         if(key_hit(KEY_B) && currNoteInd != 0){
             currNoteInd--;
             currNote = currSong[currNoteInd];
-            Terminal::eraseLine();
+            //Terminal::eraseLine();
         }
 
         if(key_hit(KEY_A) && currNoteInd != 23){
@@ -89,13 +90,13 @@ int main()
         }
 
 		if(key_hit(KEY_START)){
-            Terminal::reset();
+            //Terminal::reset();
 			playCurrSong(currSong, currNoteInd);
             note_play(currNote);
 		}
 
         if(key_hit(KEY_SELECT)){
-            Terminal::reset();
+            //Terminal::reset();
 			currNoteInd = 0;
             note_play(currNote);
 		}

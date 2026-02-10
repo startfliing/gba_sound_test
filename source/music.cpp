@@ -27,7 +27,7 @@ void note_play(note noteObj)
     // Display note and scroll
     u8 noteVal = getNoteVal(noteObj);
     s8 octave = getNoteOct(noteObj);
-    Terminal::log("%% %%", names[noteVal], octave);
+    //Terminal::log("%% %%", names[noteVal], octave);
 
     // Play the actual note
     REG_SND1FREQ = SFREQ_RESET | SND_RATE(noteVal, octave);
